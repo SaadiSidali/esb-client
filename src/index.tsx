@@ -8,6 +8,7 @@ import {
   createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 
@@ -39,7 +40,9 @@ root.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <ChakraProvider>
-        <App />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </ChakraProvider>
     </ApolloProvider>
   </React.StrictMode>

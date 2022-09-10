@@ -1,4 +1,6 @@
 export interface LoginType {
 
-    token: string;
+    signIn: {
+        token: string;
+    }
 }

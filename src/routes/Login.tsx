@@ -3,19 +3,25 @@ import {
   Box,
   Button,
   Container,
+  Flex,
   FormControl,
   FormLabel,
   Input,
   InputGroup,
   InputRightElement,
+  Link,
+  Spacer,
+  Text,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import React from "react";
+import { Link as RouterLink } from "react-router-dom";
+
 import { LoginType } from "../types/login-type";
 import { SignInInput } from "../types/signin-input";
 
 function Login() {
-  const SIGN_UP = gql`
+  const SIGN_IN = gql`
     mutation ($username: String!, $password: String!) {
       signIn(signInInput: { username: $username, password: $password }) {
         token
@@ -26,7 +32,7 @@ function Login() {
   const [signUpMutation, { data, loading }] = useMutation<
     LoginType,
     SignInInput
-  >(SIGN_UP);
+  >(SIGN_IN);
 
   const formik = useFormik({
     initialValues: {
@@ -43,7 +49,12 @@ function Login() {
     },
   });
 
-  console.log(data);
+  if (!loading && data) {
+    console.log("not loading and data");
+    console.log(data);
+
+    localStorage.setItem("token", data.signIn.token);
+  }
 
   return (
     <>
@@ -63,14 +74,22 @@ function Login() {
               <FormLabel>Password</FormLabel>
               <PasswordInput onChange={formik.handleChange}></PasswordInput>
             </FormControl>
-            <Button
-              type="submit"
-              colorScheme={"linkedin"}
-              mt={8}
-              isLoading={loading}
-            >
-              Sign in
-            </Button>
+            <Flex mt={8} align={"center"}>
+              <Button
+                type="submit"
+                colorScheme={"linkedin"}
+                isLoading={loading}
+              >
+                Sign in
+              </Button>
+              <Spacer />
+              <Text>
+                Need an account?{" "}
+                <Link color={"blue.400"}>
+                  <RouterLink to={"/signup"}> Signup.</RouterLink>
+                </Link>
+              </Text>
+            </Flex>
           </Box>
         </form>
       </Container>

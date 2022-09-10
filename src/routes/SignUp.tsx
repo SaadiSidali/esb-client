@@ -3,15 +3,21 @@ import {
   Box,
   Button,
   Container,
+  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
   Input,
   InputGroup,
   InputRightElement,
+  Link,
+  Spacer,
+  Text,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import React from "react";
+import { Link as RouterLink } from "react-router-dom";
+
 import { SignUpInput } from "../types/signup-input";
 import { UserType } from "../types/user-type";
 
@@ -82,14 +88,22 @@ function SignUp() {
               <FormLabel>Password</FormLabel>
               <PasswordInput onChange={formik.handleChange}></PasswordInput>
             </FormControl>
-            <Button
-              type="submit"
-              colorScheme={"linkedin"}
-              mt={8}
-              isLoading={loading}
-            >
-              Submit
-            </Button>
+            <Flex mt={8} align={"center"}>
+              <Button
+                type="submit"
+                colorScheme={"linkedin"}
+                isLoading={loading}
+              >
+                Sign in
+              </Button>
+              <Spacer />
+              <Text>
+                Have an account?{" "}
+                <Link color={"blue.400"}>
+                  <RouterLink to={"/login"}> Login.</RouterLink>
+                </Link>
+              </Text>
+            </Flex>
           </Box>
         </form>
       </Container>
