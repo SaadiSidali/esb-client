@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -11,8 +12,29 @@ import {
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import React from "react";
+import { SignUpInput } from "../types/signup-input";
+import { UserType } from "../types/user-type";
 
 function SignUp() {
+  const SIGN_UP = gql`
+    mutation ($email: String!, $password: String!, $username: String!) {
+      signUp(
+        signUpInput: { email: $email, password: $password, username: $username }
+      ) {
+        id
+        username
+        profile {
+          biography
+        }
+      }
+    }
+  `;
+
+  const [signUpMutation, { data, loading }] = useMutation<
+    UserType,
+    SignUpInput
+  >(SIGN_UP);
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -20,13 +42,22 @@ function SignUp() {
       password: "",
     },
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      signUpMutation({
+        variables: {
+          email: values.email,
+          password: values.password,
+          username: values.userName,
+        },
+      });
     },
   });
+
+  console.log(data);
 
   return (
     <>
       <Container centerContent>
+        {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : null}
         <form onSubmit={formik.handleSubmit}>
           <Box borderWidth="1px" borderRadius="lg" p={12} mt={16}>
             <FormControl>
@@ -51,7 +82,12 @@ function SignUp() {
               <FormLabel>Password</FormLabel>
               <PasswordInput onChange={formik.handleChange}></PasswordInput>
             </FormControl>
-            <Button type="submit" colorScheme={"linkedin"} mt={8}>
+            <Button
+              type="submit"
+              colorScheme={"linkedin"}
+              mt={8}
+              isLoading={loading}
+            >
               Submit
             </Button>
           </Box>
