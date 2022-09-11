@@ -15,12 +15,18 @@ import {
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
+import { useAppDispatch } from "../utils/hooks";
+import { setToken, setUser } from "../store/authSlice";
 import { LoginType } from "../types/login-type";
 import { SignInInput } from "../types/signin-input";
 
 function Login() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  // GraphQl
   const SIGN_IN = gql`
     mutation ($username: String!, $password: String!) {
       signIn(signInInput: { username: $username, password: $password }) {
@@ -28,7 +34,6 @@ function Login() {
       }
     }
   `;
-
   const [signUpMutation, { data, loading }] = useMutation<
     LoginType,
     SignInInput
@@ -52,14 +57,16 @@ function Login() {
   if (!loading && data) {
     console.log("not loading and data");
     console.log(data);
+    dispatch(setToken(data.signIn.token));
+    dispatch(setUser(data.signIn.token));
 
     localStorage.setItem("token", data.signIn.token);
+    navigate("/profile");
   }
 
   return (
     <>
       <Container centerContent>
-        {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : null}
         <form onSubmit={formik.handleSubmit}>
           <Box borderWidth="1px" borderRadius="lg" p={12} mt={16}>
             <FormControl>

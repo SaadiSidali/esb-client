@@ -9,8 +9,10 @@ import {
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
 
 import App from "./App";
+import store from "./store";
 
 const httpLink = createHttpLink({
   uri: "http://localhost:8000/graphql",
@@ -38,12 +40,14 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <ChakraProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ChakraProvider>
-    </ApolloProvider>
+    <Provider store={store}>
+      <ApolloProvider client={client}>
+        <ChakraProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ChakraProvider>
+      </ApolloProvider>
+    </Provider>
   </React.StrictMode>
 );
