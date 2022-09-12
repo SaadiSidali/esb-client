@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -17,25 +17,12 @@ import {
 import { useFormik } from "formik";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { SIGN_UP } from "../gql/mutations";
 
 import { SignUpInput } from "../types/signup-input";
 import { UserType } from "../types/user-type";
 
 function SignUp() {
-  const SIGN_UP = gql`
-    mutation ($email: String!, $password: String!, $username: String!) {
-      signUp(
-        signUpInput: { email: $email, password: $password, username: $username }
-      ) {
-        id
-        username
-        profile {
-          biography
-        }
-      }
-    }
-  `;
-
   const [signUpMutation, { data, loading }] = useMutation<
     UserType,
     SignUpInput

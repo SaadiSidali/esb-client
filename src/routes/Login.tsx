@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -21,20 +21,13 @@ import { useAppDispatch } from "../utils/hooks";
 import { setToken, setUser } from "../store/authSlice";
 import { LoginType } from "../types/login-type";
 import { SignInInput } from "../types/signin-input";
+import { SIGN_IN } from "../gql/mutations";
 
 function Login() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  // GraphQl
-  const SIGN_IN = gql`
-    mutation ($username: String!, $password: String!) {
-      signIn(signInInput: { username: $username, password: $password }) {
-        token
-      }
-    }
-  `;
-  const [signUpMutation, { data, loading }] = useMutation<
+  const [signInMutation, { data, loading }] = useMutation<
     LoginType,
     SignInInput
   >(SIGN_IN);
@@ -45,7 +38,7 @@ function Login() {
       password: "",
     },
     onSubmit: (values) => {
-      signUpMutation({
+      signInMutation({
         variables: {
           password: values.password,
           username: values.userName,
