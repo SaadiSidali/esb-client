@@ -1,8 +1,10 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { PhoneIcon } from "@chakra-ui/icons";
 import { IoIosSchool } from "react-icons/io";
 import { BsSignpost2Fill } from "react-icons/bs";
+import { MdAttachMoney } from "react-icons/md";
 import { AiFillGithub, AiOutlineLink, AiFillLinkedin } from "react-icons/ai";
+import { debounce } from "lodash";
 import {
   Container,
   FormLabel,
@@ -13,33 +15,104 @@ import {
   NumberInput,
   NumberInputField,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import { ME } from "../gql/queries";
+import { UPDATE_PROFILE_MUTATION } from "../gql/mutations";
 import { UserType } from "../types/user-type";
 import { PrivateRoute } from "./PrivateRoute";
 
 function Profile() {
-  const { loading, error, data } = useQuery<{ me: UserType }>(ME);
+  const { loading: loadingProfile, data: profileData } = useQuery<{
+    me: UserType;
+  }>(ME);
+  const [
+    updateProfileMutation,
+    { data: updateProfileData, loading: updateProfileLoading },
+  ] = useMutation<
+    { updateProfile: boolean },
+    {
+      field: string;
+      value: string;
+    }
+  >(UPDATE_PROFILE_MUTATION);
+  let debouncedFuncs: any = {};
+
+  // YUCK
+  // TODO: fix this shit
+  if (profileData) {
+    Object.keys(profileData.me.profile).forEach((key) => {
+      debouncedFuncs[key] = debounce(
+        async (e: React.ChangeEvent<HTMLInputElement>) => {
+          const res = await updateProfileMutation({
+            variables: { field: e.target.name, value: e.target.value },
+          });
+          if (res.data?.updateProfile) {
+            toast({
+              duration: 1000,
+              position: "top-right",
+              status: "success",
+              title: "Profile Updated!",
+              variant: "subtle",
+            });
+            setTimeout(() => {
+              toast.close("saving");
+            }, 100);
+          }
+        },
+        1000
+      );
+    });
+  }
+
+  const handleChange = async (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!toast.isActive("saving")) {
+      toast({
+        position: "top-right",
+        status: "loading",
+        title: "saving...",
+        variant: "subtle",
+        id: "saving",
+      });
+    }
+    await debouncedFuncs[e.target.name](e);
+  };
+
+  const toast = useToast();
   return (
     <>
       <PrivateRoute>
         <Heading>Profile</Heading>
-        {loading ? "Loading..." : null}
+        {loadingProfile ? "Loading..." : null}
 
         <Container>
           <FormLabel>First Name</FormLabel>
 
-          <Input placeholder="John" defaultValue={data?.me.profile.firstName} />
+          <Input
+            placeholder="John"
+            defaultValue={profileData?.me.profile.firstName}
+            name="firstName"
+            onChange={handleChange}
+          />
 
           <FormLabel>Last Name</FormLabel>
 
-          <Input placeholder="Doe" defaultValue={data?.me.profile.lastName} />
+          <Input
+            placeholder="Doe"
+            defaultValue={profileData?.me.profile.lastName}
+            name="lastName"
+            onChange={handleChange}
+          />
 
           <FormLabel>Biography</FormLabel>
 
           <Textarea
             placeholder="Tell us about yourself..."
-            defaultValue={data?.me.profile.biography}
+            defaultValue={profileData?.me.profile.biography}
+            name="biography"
+            onChange={handleChange}
           />
           <FormLabel>Phone</FormLabel>
 
@@ -51,7 +124,9 @@ function Profile() {
             <Input
               type="tel"
               placeholder="Phone number"
-              defaultValue={data?.me.profile.phoneNumber}
+              defaultValue={profileData?.me.profile.phoneNumber}
+              name="phoneNumber"
+              onChange={handleChange}
             />
           </InputGroup>
           <FormLabel>Level of study</FormLabel>
@@ -64,17 +139,26 @@ function Profile() {
             />
             <Input
               placeholder="Bachelor..."
-              defaultValue={data?.me.profile.levelOfStudy}
+              defaultValue={profileData?.me.profile.levelOfStudy}
+              name="levelOfStudy"
+              onChange={handleChange}
             />
           </InputGroup>
           <FormLabel>Salary</FormLabel>
-
-          <NumberInput>
-            <NumberInputField
-              placeholder="Enter amount"
-              defaultValue={data?.me.profile.expectedSalary}
+          <InputGroup>
+            <InputLeftElement
+              pointerEvents="none"
+              color="gray.300"
+              fontSize="1.2em"
+              children={<MdAttachMoney />}
             />
-          </NumberInput>
+            <Input
+              placeholder="Enter amount"
+              defaultValue={profileData?.me.profile.expectedSalary}
+              name="expectedSalary"
+              onChange={handleChange}
+            />
+          </InputGroup>
 
           <FormLabel>Wilaya</FormLabel>
           <InputGroup>
@@ -84,7 +168,12 @@ function Profile() {
               fontSize="1.2em"
               children={<BsSignpost2Fill />}
             />
-            <Input placeholder="Alger" defaultValue={data?.me.profile.wilaya} />
+            <Input
+              placeholder="Alger"
+              defaultValue={profileData?.me.profile.wilaya}
+              name="wilaya"
+              onChange={handleChange}
+            />
           </InputGroup>
           <FormLabel>Repository</FormLabel>
           <InputGroup>
@@ -96,7 +185,9 @@ function Profile() {
             />
             <Input
               placeholder="Github / Gitlab"
-              defaultValue={data?.me.profile.repoUrl}
+              defaultValue={profileData?.me.profile.repoUrl}
+              name="repoUrl"
+              onChange={handleChange}
             />
           </InputGroup>
 
@@ -110,7 +201,9 @@ function Profile() {
             />
             <Input
               placeholder="www.example.com"
-              defaultValue={data?.me.profile.portfolio}
+              defaultValue={profileData?.me.profile.portfolio}
+              name="portfolio"
+              onChange={handleChange}
             />
           </InputGroup>
           <FormLabel>LinkedIn</FormLabel>
@@ -123,7 +216,9 @@ function Profile() {
             />
             <Input
               placeholder="www.linkedin.com/user"
-              defaultValue={data?.me.profile.linkedInUrl}
+              defaultValue={profileData?.me.profile.linkedInUrl}
+              name="linkedInUrl"
+              onChange={handleChange}
             />
           </InputGroup>
         </Container>

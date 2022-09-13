@@ -21,7 +21,7 @@ import { useAppDispatch } from "../utils/hooks";
 import { setToken, setUser } from "../store/authSlice";
 import { LoginType } from "../types/login-type";
 import { SignInInput } from "../types/signin-input";
-import { SIGN_IN } from "../gql/mutations";
+import { SIGN_IN_MUTATION } from "../gql/mutations";
 
 function Login() {
   const dispatch = useAppDispatch();
@@ -30,7 +30,7 @@ function Login() {
   const [signInMutation, { data, loading }] = useMutation<
     LoginType,
     SignInInput
-  >(SIGN_IN);
+  >(SIGN_IN_MUTATION);
 
   const formik = useFormik({
     initialValues: {

@@ -17,7 +17,7 @@ import {
 import { useFormik } from "formik";
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { SIGN_UP } from "../gql/mutations";
+import { SIGN_UP_MUTATION } from "../gql/mutations";
 
 import { SignUpInput } from "../types/signup-input";
 import { UserType } from "../types/user-type";
@@ -26,7 +26,7 @@ function SignUp() {
   const [signUpMutation, { data, loading }] = useMutation<
     UserType,
     SignUpInput
-  >(SIGN_UP);
+  >(SIGN_UP_MUTATION);
 
   const formik = useFormik({
     initialValues: {
