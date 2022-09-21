@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Heading, Link, Spacer } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Link,
+  Spacer,
+} from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 
 import { logout } from "../store/authSlice";
@@ -12,6 +20,7 @@ function NavBar() {
     dispatch(logout());
   };
 
+
   return (
     <>
       <Box w={"100%"} boxShadow="base" rounded="md">
@@ -22,19 +31,27 @@ function NavBar() {
           <Spacer />
           {!authUser ? (
             <>
-              <RouterLink to="/login">
-                <Link mr={2} color={"purple.700"}>
-                  Login
-                </Link>
-              </RouterLink>
+              <Link mr={2} color={"purple.700"} to="/login" as={RouterLink}>
+                Login
+              </Link>
               <RouterLink to="/signup">
                 <Button backgroundColor={"lavender"}>Signup</Button>
               </RouterLink>
             </>
           ) : (
-            <Link mr={2} color={"purple.700"} onClick={handleLogout}>
-              Logout
-            </Link>
+            <>
+              <RouterLink to={"/profile"}>
+                <Avatar
+                  name={authUser.username}
+                  src={authUser.imgUrl}
+                  size={"sm"}
+                />
+              </RouterLink>
+
+              <Link mr={2} color={"purple.700"} onClick={handleLogout} ml={4}>
+                Logout
+              </Link>
+            </>
           )}
         </Flex>
       </Box>

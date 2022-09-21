@@ -7,8 +7,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  InputGroup,
-  InputRightElement,
   Link,
   Spacer,
   Text,
@@ -22,12 +20,14 @@ import { setToken, setUser } from "../store/authSlice";
 import { LoginType } from "../types/login-type";
 import { SignInInput } from "../types/signin-input";
 import { SIGN_IN_MUTATION } from "../gql/mutations";
+import ErrorAlert from "../components/ErrorAlert";
+import { PasswordInput } from "../components/PasswordInput";
 
 function Login() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [signInMutation, { data, loading }] = useMutation<
+  const [signInMutation, { data, loading, error }] = useMutation<
     LoginType,
     SignInInput
   >(SIGN_IN_MUTATION);
@@ -46,10 +46,7 @@ function Login() {
       });
     },
   });
-
   if (!loading && data) {
-    console.log("not loading and data");
-    console.log(data);
     dispatch(setToken(data.signIn.token));
     dispatch(setUser(data.signIn.token));
 
@@ -85,36 +82,18 @@ function Login() {
               <Spacer />
               <Text>
                 Need an account?{" "}
-                <Link color={"blue.400"}>
-                  <RouterLink to={"/signup"}> Signup.</RouterLink>
+                <Link color={"blue.400"} as={RouterLink} to={"/signup"}>
+                  Signup.
                 </Link>
               </Text>
             </Flex>
+
+            {error ? <ErrorAlert error={error} /> : null}
           </Box>
         </form>
       </Container>
     </>
   );
 }
-function PasswordInput({ onChange }: any) {
-  const [show, setShow] = React.useState(false);
-  const handleClick = () => setShow(!show);
 
-  return (
-    <InputGroup size="md">
-      <Input
-        pr="4.5rem"
-        type={show ? "text" : "password"}
-        placeholder="Enter password"
-        name="password"
-        onChange={onChange}
-      />
-      <InputRightElement width="4.5rem">
-        <Button h="1.75rem" size="sm" onClick={handleClick}>
-          {show ? "Hide" : "Show"}
-        </Button>
-      </InputRightElement>
-    </InputGroup>
-  );
-}
 export default Login;

@@ -8,5 +8,7 @@ export interface UserType {
 
     email: string;
 
+    imgUrl: string;
+
     profile: ProfileType;
 }

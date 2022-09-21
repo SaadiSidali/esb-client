@@ -1,19 +1,18 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { PhoneIcon } from "@chakra-ui/icons";
 import { IoIosSchool } from "react-icons/io";
-import { BsSignpost2Fill } from "react-icons/bs";
-import { MdAttachMoney } from "react-icons/md";
+import { BsPerson, BsSignpost2Fill } from "react-icons/bs";
+
 import { AiFillGithub, AiOutlineLink, AiFillLinkedin } from "react-icons/ai";
 import { debounce } from "lodash";
 import {
+  Avatar,
   Container,
   FormLabel,
   Heading,
   Input,
   InputGroup,
   InputLeftElement,
-  NumberInput,
-  NumberInputField,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
@@ -21,15 +20,14 @@ import { ME } from "../gql/queries";
 import { UPDATE_PROFILE_MUTATION } from "../gql/mutations";
 import { UserType } from "../types/user-type";
 import { PrivateRoute } from "./PrivateRoute";
+import SalaryRange from "../components/SalaryOptions";
+import { UploadFileInput } from "../components/UploadFileInput";
 
 function Profile() {
   const { loading: loadingProfile, data: profileData } = useQuery<{
     me: UserType;
   }>(ME);
-  const [
-    updateProfileMutation,
-    { data: updateProfileData, loading: updateProfileLoading },
-  ] = useMutation<
+  const [updateProfileMutation] = useMutation<
     { updateProfile: boolean },
     {
       field: string;
@@ -60,7 +58,7 @@ function Profile() {
             }, 100);
           }
         },
-        1000
+        2500
       );
     });
   }
@@ -79,6 +77,7 @@ function Profile() {
     }
     await debouncedFuncs[e.target.name](e);
   };
+  
 
   const toast = useToast();
   return (
@@ -88,8 +87,8 @@ function Profile() {
         {loadingProfile ? "Loading..." : null}
 
         <Container>
+          <UploadFileInput url={profileData?.me.imgUrl} />
           <FormLabel>First Name</FormLabel>
-
           <Input
             placeholder="John"
             defaultValue={profileData?.me.profile.firstName}
@@ -145,20 +144,10 @@ function Profile() {
             />
           </InputGroup>
           <FormLabel>Salary</FormLabel>
-          <InputGroup>
-            <InputLeftElement
-              pointerEvents="none"
-              color="gray.300"
-              fontSize="1.2em"
-              children={<MdAttachMoney />}
-            />
-            <Input
-              placeholder="Enter amount"
-              defaultValue={profileData?.me.profile.expectedSalary}
-              name="expectedSalary"
-              onChange={handleChange}
-            />
-          </InputGroup>
+          <SalaryRange
+            onChange={handleChange}
+            defaultValue={profileData?.me.profile.expectedSalary}
+          />
 
           <FormLabel>Wilaya</FormLabel>
           <InputGroup>
